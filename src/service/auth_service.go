@@ -8,12 +8,14 @@ import (
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/objx"
 	"github.dip-net.co.jp/dip/robotics-auth/src/authpb"
+	"github.dip-net.co.jp/dip/robotics-auth/src/infrastructure"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 // AuthService is ...
 type AuthService struct {
+	redisHandler infrastructure.RedisHandler
 }
 
 // Login ログイン処理の実行　Googleのプロバイダを使用。
@@ -50,6 +52,8 @@ func (s *AuthService) CallBack(ctx context.Context, req *authpb.CallBackRequest)
 	}
 	// todo redisへの登録
 	fmt.Println(user)
+
+	s.redisHandler.SetWithExpire("test", "test")
 
 	return &authpb.CallBackResponse{}, nil
 }
