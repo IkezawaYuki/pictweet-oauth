@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package auth;
+
+// ここはコンパイルエラーになる。
+import "google/api/annotations.proto";
+
+option go_package="authpb";
+
+message LoginRequest{
+    int32 num = 1;
+}
+
+message LoginResponse{
+    int32 num = 1;
+}
+
+message CallBackRequest{
+    string code = 1;
+}
+
+message CallBackResponse{
+    string result = 1;
+}
+
+service AuthService{
+    rpc Login(LoginRequest)returns(LoginResponse){
+        option (google.api.http) = { 
+            get: "/auth/login",
+        };
+    };
+    rpc CallBack(CallBackRequest) returns(CallBackResponse){
+        option (google.api.http) = {
+            get: "/auth/callback/google",
+        };
+    };
+}
