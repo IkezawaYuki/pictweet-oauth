@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/IkezawaYuki/pictweet-oauth/src/authpb"
-	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure"
+	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure/datastore"
 	server "github.com/IkezawaYuki/pictweet-oauth/src/service"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -26,10 +26,10 @@ func StartGrpcServer() {
 		panic(err)
 	}
 
-	c := infrastructure.GetConnection()
+	c := datastore.GetConnection()
 	defer c.Close()
 
-	service := server.NewAuthService(infrastructure.NewRedisHandler(c))
+	service := server.NewAuthService(datastore.NewRedisHandler(c))
 	s := grpc.NewServer()
 	authpb.RegisterAuthServiceServer(s, service)
 
@@ -38,7 +38,7 @@ func StartGrpcServer() {
 	}
 }
 
-func StartHttpServer(){
+func StartHttpServer() {
 	fmt.Println("start reverse proxy server entry point...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -47,12 +47,12 @@ func StartHttpServer(){
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err := authpb.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, *authEndpoint , opts)
-	if err != nil{
+	err := authpb.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, *authEndpoint, opts)
+	if err != nil {
 		log.Fatalf("failed to reverse: %v", err)
 	}
 
-	if err := http.ListenAndServe(":8080", mux); err != nil{
+	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 

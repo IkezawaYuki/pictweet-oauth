@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/IkezawaYuki/pictweet-oauth/src/server"
+	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure/server"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/gomniauth"
@@ -20,7 +20,7 @@ func main() {
 	server.StartHttpServer()
 }
 
-func init(){
+func init() {
 	fmt.Println("init...")
 	err := godotenv.Load()
 	if err != nil {
@@ -28,4 +28,3 @@ func init(){
 		logrus.Fatalf("Error loading .env")
 	}
 }
-

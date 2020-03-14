@@ -3,21 +3,21 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure/datastore"
 	"github.com/google/uuid"
 	"log"
 
 	"github.com/IkezawaYuki/pictweet-oauth/src/authpb"
-	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/objx"
 )
 
 // AuthService is ...
 type AuthService struct {
-	redisHandler infrastructure.RedisHandler
+	redisHandler datastore.RedisHandler
 }
 
-func NewAuthService(h infrastructure.RedisHandler) *AuthService {
+func NewAuthService(h datastore.RedisHandler) *AuthService {
 	return &AuthService{
 		redisHandler: h,
 	}
