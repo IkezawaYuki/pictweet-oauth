@@ -2,8 +2,6 @@ package infrastructure
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -14,7 +12,7 @@ type redisHandler struct {
 
 // RedisHandler is ...
 type RedisHandler interface {
-	Get(string) (string, error)
+	Get(string) string
 	SetWithExpire(string, string) error
 }
 
@@ -37,25 +35,18 @@ func GetConnection() redis.Conn {
 }
 
 // Get 値の取得
-func (h *redisHandler) Get(key string) (string, error) {
-	res, err := redis.String(h.handler.Do("GET", key))
-	if err != nil {
-		panic(err)
-	}
-	return res, nil
+func (h *redisHandler) Get(key string) string {
+	fmt.Println(key)
+	res, _ := redis.String(h.handler.Do("GET", key))
+	fmt.Println(res)
+	return res
 }
 
 // SetWithExpire 有効期限付きで値の設定
 func (h *redisHandler) SetWithExpire(token string, email string) error {
-	val, err := h.handler.Do("SET", email, token, "NX", "EX", "10")
+	_, err := h.handler.Do("SET", token, email, "NX", "EX", "30")
 	if err != nil {
 		return err
 	}
-
-	if val == nil {
-		fmt.Println("already exist")
-		os.Exit(1)
-	}
-
 	return nil
 }

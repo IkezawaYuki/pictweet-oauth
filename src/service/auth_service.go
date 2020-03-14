@@ -17,7 +17,7 @@ type AuthService struct {
 	redisHandler infrastructure.RedisHandler
 }
 
-func NewAuthService(h infrastructure.RedisHandler)*AuthService{
+func NewAuthService(h infrastructure.RedisHandler) *AuthService {
 	return &AuthService{
 		redisHandler: h,
 	}
@@ -47,7 +47,7 @@ func (s *AuthService) CallBack(ctx context.Context, req *authpb.CallBackRequest)
 	if err != nil {
 		log.Fatalln("failed to get provider", provider, "-", err)
 	}
-	creds, err := provider.CompleteAuth(objx.MustFromURLQuery("code="+req.GetCode()))
+	creds, err := provider.CompleteAuth(objx.MustFromURLQuery("code=" + req.GetCode()))
 	if err != nil {
 		log.Fatalln("authentication could not be completed.")
 	}
@@ -58,9 +58,24 @@ func (s *AuthService) CallBack(ctx context.Context, req *authpb.CallBackRequest)
 	fmt.Println(user)
 
 	uuidObj, _ := uuid.NewUUID()
-	s.redisHandler.SetWithExpire(uuidObj.String(), user.Email())
+	token := uuidObj.String()
+	email := user.Email()
+	s.redisHandler.SetWithExpire(token, email)
 
 	return &authpb.CallBackResponse{
 		Token: uuidObj.String(),
+	}, nil
+}
+
+// VerifyToken ログインしているかどうか
+func (s *AuthService) VerifyToken(ctx context.Context, req *authpb.VerifyTokenRequest) (*authpb.VerifyTokenResponse, error) {
+	email := s.redisHandler.Get(req.GetToken())
+	if email == "" {
+		return &authpb.VerifyTokenResponse{
+			IsLoggedId: false,
+		}, nil
+	}
+	return &authpb.VerifyTokenResponse{
+		IsLoggedId: true,
 	}, nil
 }

@@ -28,3 +28,4 @@ func init(){
 		logrus.Fatalf("Error loading .env")
 	}
 }
+

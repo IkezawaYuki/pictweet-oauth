@@ -24,6 +24,14 @@ message CallBackResponse{
     string token = 1;
 }
 
+message VerifyTokenRequest{
+    string token = 1;
+}
+
+message VerifyTokenResponse{
+    bool is_logged_id = 1;
+}
+
 service AuthService{
     rpc Login(LoginRequest)returns(LoginResponse){
         option (google.api.http) = { 
@@ -35,4 +43,9 @@ service AuthService{
             get: "/auth/callback/google",
         };
     };
+    rpc VerifyToken(VerifyTokenRequest)returns (VerifyTokenResponse){
+        option (google.api.http) = {
+            get: "/auth/verify",
+        };
+    }
 }
