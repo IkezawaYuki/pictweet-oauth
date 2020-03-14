@@ -13,6 +13,7 @@ message LoginRequest{
 
 message LoginResponse{
     int32 num = 1;
+    string redirect_url = 2;
 }
 
 message CallBackRequest{
@@ -20,7 +21,7 @@ message CallBackRequest{
 }
 
 message CallBackResponse{
-    string result = 1;
+    string token = 1;
 }
 
 service AuthService{

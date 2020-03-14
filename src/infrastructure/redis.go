@@ -47,7 +47,7 @@ func (h *redisHandler) Get(key string) (string, error) {
 
 // SetWithExpire 有効期限付きで値の設定
 func (h *redisHandler) SetWithExpire(token string, email string) error {
-	val, err := h.handler.Do("SET", email, token, "NX", "EX", "120")
+	val, err := h.handler.Do("SET", email, token, "NX", "EX", "10")
 	if err != nil {
 		return err
 	}
