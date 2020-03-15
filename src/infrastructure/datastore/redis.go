@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"fmt"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -36,9 +35,7 @@ func GetConnection() redis.Conn {
 
 // Get 値の取得
 func (h *redisHandler) Get(key string) string {
-	fmt.Println(key)
 	res, _ := redis.String(h.handler.Do("GET", key))
-	fmt.Println(res)
 	return res
 }
 

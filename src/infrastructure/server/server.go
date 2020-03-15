@@ -3,24 +3,37 @@ package server
 import (
 	"context"
 	"flag"
-	"fmt"
 	"github.com/IkezawaYuki/pictweet-oauth/src/authpb"
 	"github.com/IkezawaYuki/pictweet-oauth/src/infrastructure/datastore"
 	server "github.com/IkezawaYuki/pictweet-oauth/src/service"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"net/http"
+	"os"
 )
 
 var (
-	authEndpoint = flag.String("echo_endpoint", "localhost:50051", "endpoint of YourService")
+	authEndpoint = flag.String("echo_endpoint", "localhost:50051", "endpoint of authService")
 )
 
-// StartGrpcServer gRPCエントリーポイントの起動
-func StartGrpcServer() {
-	fmt.Println("start grpc server entry point...")
+func Run() {
+	gomniauth.SetSecurityKey(os.Getenv("SECURITY_KEY"))
+	gomniauth.WithProviders(
+		google.New(os.Getenv("CLIENT_ID"), os.Getenv("SECRET_VALUE"), "http://localhost:8080/auth/callback/google"),
+	)
+
+	go startGrpcEndPoint()
+	startRestEndPoint()
+}
+
+// startGrpcEndPoint gRPCエントリーポイントの起動
+func startGrpcEndPoint() {
+	log.Println("start grpc server entry point...")
 	lis, err := net.Listen("tcp", "127.0.0.1:50051")
 	if err != nil {
 		panic(err)
@@ -32,14 +45,14 @@ func StartGrpcServer() {
 	service := server.NewAuthService(datastore.NewRedisHandler(c))
 	s := grpc.NewServer()
 	authpb.RegisterAuthServiceServer(s, service)
-
+	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve : %v", err)
 	}
 }
 
-func StartHttpServer() {
-	fmt.Println("start reverse proxy server entry point...")
+func startRestEndPoint() {
+	log.Println("start reverse proxy server entry point...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

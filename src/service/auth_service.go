@@ -25,7 +25,7 @@ func NewAuthService(h datastore.RedisHandler) *AuthService {
 
 // Login ログイン処理の実行　Googleのプロバイダを使用。
 func (s *AuthService) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-	fmt.Println("Login function is invoked")
+	log.Println("Login function is invoked")
 	provider, err := gomniauth.Provider("google")
 	if err != nil {
 		log.Fatalln("failed to get provider: ", provider, "-", err)
@@ -42,7 +42,7 @@ func (s *AuthService) Login(ctx context.Context, req *authpb.LoginRequest) (*aut
 
 // CallBack Googleでの認証後の処理
 func (s *AuthService) CallBack(ctx context.Context, req *authpb.CallBackRequest) (*authpb.CallBackResponse, error) {
-	fmt.Println("call back function is invoked")
+	log.Println("call back function is invoked")
 	provider, err := gomniauth.Provider("google")
 	if err != nil {
 		log.Fatalln("failed to get provider", provider, "-", err)
